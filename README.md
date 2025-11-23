@@ -33,12 +33,16 @@ Telegram bot for renting and providing TRON energy using aiogram 3, aiohttp, and
 - `DATABASE_PATH` (default `bot_data.sqlite3`): SQLite file path.
 - `PAYMENT_CHECK_INTERVAL_SEC` (default `30`): Seconds between payment checks.
 - `SIMULATE_PAYMENTS` (default `true`): If true, invoices auto-complete after ~1 minute; set to `false` to rely on TronGrid polling.
-- `PAYMENT_RECEIVER_ADDRESS` (required for real payments): TRON address where users should send TRX.
+- `PAYMENT_RECEIVER_ADDRESS` (required for real payments): TRON address where users should send TRX. If omitted but a tronsave.io API key is provided, the bot will try to use your tronsave.io deposit address.
 - `TRON_API_BASE` (default `https://api.trongrid.io`): TronGrid base URL.
 - `TRON_API_KEY` (optional): TronGrid API key header `TRON-PRO-API-KEY`.
-- `TRONSAVE_API_BASE` (default `https://tronsave.io`): tronsave.io API base.
-- `TRONSAVE_API_KEY` (optional): tronsave.io bearer token.
+- `TRONSAVE_API_BASE` (default `https://api.tronsave.io`): tronsave.io API base.
+- `TRONSAVE_API_KEY` (optional but required for live pricing): tronsave.io API key passed as `apikey` header.
+- `TRONSAVE_DURATION_SEC` (default `259200`): Rental duration passed to tronsave.io.
+- `TRONSAVE_UNIT_PRICE` (default `MEDIUM`): Unit price strategy (`FAST`, `MEDIUM`, `SLOW`, or numeric SUN value).
+- `TRONSAVE_ALLOW_PARTIAL_FILL` (default `true`): Whether orders may be partially filled.
+- `TRONSAVE_MIN_DELEGATE_AMOUNT` (default `32000`): Minimum energy delegated by a single provider when estimating and buying.
 
 ## Notes
 - TRON RPC and tronsave.io integrations now use live HTTP calls; ensure the API endpoints and keys are configured before production.
-- Payment detection polls TronGrid for transfers to `PAYMENT_RECEIVER_ADDRESS` and matches invoice amounts.
+- Payment detection polls TronGrid for transfers to `PAYMENT_RECEIVER_ADDRESS` (or your tronsave.io deposit address) and matches invoice amounts.

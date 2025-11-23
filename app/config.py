@@ -26,6 +26,10 @@ class Settings:
     tron_api_key: str
     tronsave_api_base: str
     tronsave_api_key: str
+    tronsave_duration_sec: int
+    tronsave_unit_price: str
+    tronsave_allow_partial_fill: bool
+    tronsave_min_delegate_amount: int
 
 
 settings = Settings(
@@ -39,8 +43,12 @@ settings = Settings(
     payment_receiver_address=os.getenv("PAYMENT_RECEIVER_ADDRESS", ""),
     tron_api_base=os.getenv("TRON_API_BASE", "https://api.trongrid.io"),
     tron_api_key=os.getenv("TRON_API_KEY", ""),
-    tronsave_api_base=os.getenv("TRONSAVE_API_BASE", "https://tronsave.io"),
+    tronsave_api_base=os.getenv("TRONSAVE_API_BASE", "https://api.tronsave.io"),
     tronsave_api_key=os.getenv("TRONSAVE_API_KEY", ""),
+    tronsave_duration_sec=int(os.getenv("TRONSAVE_DURATION_SEC", "259200")),
+    tronsave_unit_price=os.getenv("TRONSAVE_UNIT_PRICE", "MEDIUM"),
+    tronsave_allow_partial_fill=str_to_bool(os.getenv("TRONSAVE_ALLOW_PARTIAL_FILL"), True),
+    tronsave_min_delegate_amount=int(os.getenv("TRONSAVE_MIN_DELEGATE_AMOUNT", "32000")),
 )
 
 logging.basicConfig(

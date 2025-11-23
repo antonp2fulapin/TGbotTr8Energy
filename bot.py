@@ -24,7 +24,7 @@ from app.keyboards import (
 from app.payment import payment_watcher
 from app.states import BuyEnergyStates, ProvideEnergyStates
 from app.tron_client import get_tron_balances
-from app.tronsave_client import EnergyPackage, get_energy_packages
+from app.tronsave_client import EnergyPackage, get_account_info, get_energy_packages
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -110,7 +110,7 @@ async def receive_wallet_address(message: Message, state: FSMContext) -> None:
     balances = await get_tron_balances(address)
     await message.answer(format_wallet_info(address, balances))
 
-    packages = await get_energy_packages()
+    packages = await get_energy_packages(address)
     labeled_packages = [(pkg.id, format_package_label(pkg)) for pkg in packages]
     await message.answer(
         "🔋 Available Energy Packages",
@@ -128,7 +128,7 @@ async def handle_package_selection(callback: CallbackQuery, state: FSMContext) -
         return
 
     package_id = int(callback.data.split(":", maxsplit=1)[1])
-    packages = {pkg.id: pkg for pkg in await get_energy_packages()}
+    packages = {pkg.id: pkg for pkg in await get_energy_packages(wallet_address)}
     pkg = packages.get(package_id)
     if not pkg:
         await callback.message.answer("Selected package not found. Please try again.")
@@ -237,6 +237,14 @@ async def receive_provider_address(message: Message, state: FSMContext) -> None:
 
 async def on_startup(bot: Bot) -> None:
     await db.init_db()
+    if not settings.payment_receiver_address and settings.tronsave_api_key:
+        info = await get_account_info()
+        deposit = (info or {}).get("depositAddress") if info else None
+        if deposit:
+            settings.payment_receiver_address = deposit
+            logger.info("Using tronsave.io deposit address for payments")
+        else:
+            logger.warning("Unable to determine payment receiver address from tronsave.io")
     asyncio.create_task(payment_watcher(bot))
 
 
